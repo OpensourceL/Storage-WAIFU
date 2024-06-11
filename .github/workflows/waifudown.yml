@@ -1,13 +1,12 @@
 name: Waifu Df
 
 on:
-
   push:
     branches:
       - master
       
   schedule:
-  - cron: "0 4,12,15,18,22 * * *" # See https://crontab.guru/#0_4,12,15,18,19_*_*_*
+    - cron: "0 4,12,15,18,22 * * *" # See https://crontab.guru/#0_4,12,15,18,19_*_*_*
 
 jobs:
   auto_commit:
@@ -18,16 +17,18 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Modify Last Update
+      - name: Fetch Waifu Image
         run: |
-          d=`date '+%Y-%m-%dT%H:%M:%SZ By Yusupkakuu!'`
-          echo $d > LAST_UPDATED
+          curl -s https://api.waifu.im/search?included_tags=waifu | jq -r '.images[0].url' > waifu_url.txt
+          img_url=$(cat waifu_url.txt)
+          img_name=$(basename $img_url)
+          curl -s -o tmp/$img_name $img_url
           
       - name: Commit Changes
         run: |
           git config --local user.email "yusupsiapasangka@gmail.com"
           git config --local user.name "HindiaFtNpc"
-          git add -A
+          git add tmp/
           
           arr[0]="chore(bot): ❤️‍🩹 auto commit"
           arr[1]="chore(bot): 💜 auto commit"
