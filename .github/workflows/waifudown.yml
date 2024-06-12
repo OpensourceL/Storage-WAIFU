@@ -43,8 +43,9 @@ jobs:
           img_name=$(basename $img_url)
           curl -s -o tmp/maid/$img_name $img_url
           
-      - name: Commit Changes
+      - name: Commit Changes & rm .txt
         run: |
+          rm -f waifu_url.txt hentai_url.txt milf_url.txt maid_url.txt
           git config --local user.email "yusupsiapasangka@gmail.com"
           git config --local user.name "HindiaFtNpc"
           git add tmp/
@@ -71,9 +72,8 @@ jobs:
           directory: "."
           github_token: ${{ secrets.GH_TOKEN }}
 
-      - name: Remove .txt files from repo
+      - name: Push Finnish
         run: |
-          rm -f waifu_url.txt hentai_url.txt milf_url.txt maid_url.txt
           git add -u
           git commit -m "chore(bot): Remove .txt files" || echo "No .txt files to remove"
           remote_repo="https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git"
