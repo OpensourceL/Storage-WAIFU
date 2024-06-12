@@ -11,28 +11,37 @@ on:
 jobs:
   auto_commit:
     runs-on: ubuntu-latest
-    steps:
+    steps:       
       - uses: actions/checkout@v3      
         with:
-          persist-credentials: true
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Fetch Waifu Images
         run: |
-          fetch_images() {
-            local category=$1
-            local url="https://api.waifu.im/search?included_tags=$category"
-            local urls=$(curl -s "$url" | jq -r '.images[].url' | head -n 100)
-            for img_url in $urls; do
-              img_name=$(basename $img_url)
-              curl -s -o "tmp/$category/$img_name" $img_url
-            done
-          }
-
-          fetch_images "waifu"
-          fetch_images "hentai"
-          fetch_images "milf"
-          fetch_images "maid"
+          # Download Waifu images
+          curl -s https://api.waifu.im/search?included_tags=waifu | jq -r '.images[0].url' > waifu_url.txt
+          img_url=$(cat waifu_url.txt)
+          img_name=$(basename $img_url)
+          curl -s -o tmp/waifu/$img_name $img_url
+          
+          # Download H images
+          curl -s https://api.waifu.im/search?included_tags=hentai | jq -r '.images[0].url' > hentai_url.txt
+          img_url=$(cat hentai_url.txt)
+          img_name=$(basename $img_url)
+          curl -s -o tmp/hentai/$img_name $img_url
+          
+          # Download MILF images
+          curl -s https://api.waifu.im/search?included_tags=milf | jq -r '.images[0].url' > milf_url.txt
+          img_url=$(cat milf_url.txt)
+          img_name=$(basename $img_url)
+          curl -s -o tmp/milf/$img_name $img_url
+          
+          # Download Maid images
+          curl -s https://api.waifu.im/search?included_tags=maid | jq -r '.images[0].url' > maid_url.txt
+          img_url=$(cat maid_url.txt)
+          img_name=$(basename $img_url)
+          curl -s -o tmp/maid/$img_name $img_url
           
       - name: Commit Changes
         run: |
@@ -40,21 +49,32 @@ jobs:
           git config --local user.name "HindiaFtNpc"
           git add tmp/
           
-          arr=("chore(bot): ❤️‍🩹 auto commit" "chore(bot): 💜 auto commit" "chore(bot): 💙 auto commit" "chore(bot): 🧡 auto commit" "chore(bot): 🩶 auto commit" "chore(bot): 🤎 auto commit" "chore(bot): 🖤 auto commit" "chore(bot): 🤍 auto commit" "chore(bot): 🩵 auto commit" "chore(bot): 💔 auto commit")
-          rand=$RANDOM
-          let "rand %= ${#arr[@]}"
+          arr[0]="chore(bot): ❤️‍🩹 auto commit"
+          arr[1]="chore(bot): 💜 auto commit"
+          arr[2]="chore(bot): 💙 auto commit"
+          arr[3]="chore(bot): 🧡 auto commit"
+          arr[4]="chore(bot): 🩶 auto commit"
+          arr[5]="chore(bot): 🤎 auto commit"
+          arr[6]="chore(bot): 🖤 auto commit"
+          arr[7]="chore(bot): 🤍 auto commit"
+          arr[8]="chore(bot): 🩵 auto commit"
+          arr[9]="chore(bot): 💔 auto commit"
+          
+          rand=$[$RANDOM % ${#arr[@]}]
           
           git commit -m "${arr[$rand]}"
           
       - name: GitHub Push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          git push origin HEAD:main
+        uses: ad-m/github-push-action@master
+        with:
+          force: true
+          directory: "."
+          github_token: ${{ secrets.GH_TOKEN }}
 
       - name: Remove .txt files from repo
         run: |
           rm -f waifu_url.txt hentai_url.txt milf_url.txt maid_url.txt
           git add -u
           git commit -m "chore(bot): Remove .txt files" || echo "No .txt files to remove"
-          git push origin HEAD:main
+          remote_repo="https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push $remote_repo HEAD:main || (sleep 10 && git push $remote_repo HEAD:main)
