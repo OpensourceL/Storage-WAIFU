@@ -3,7 +3,7 @@ name: Waifu Df
 on:
   push:
     branches:
-      - main
+      - maindl
       
   schedule:
     - cron: "0 4,12,15,18,22 * * *" # See https://crontab.guru/#0_4,12,15,18,19_*_*_*
