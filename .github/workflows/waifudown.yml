@@ -47,8 +47,8 @@ jobs:
         run: |
           git config --local user.email "yusupsiapasangka@gmail.com"
           git config --local user.name "HindiaFtNpc"
-          git add tmp/
-          
+          git add tmp/ waifu_url.txt hentai_url.txt milf_url.txt maid_url.txt
+
           arr[0]="chore(bot): ❤️‍🩹 auto commit"
           arr[1]="chore(bot): 💜 auto commit"
           arr[2]="chore(bot): 💙 auto commit"
@@ -62,7 +62,7 @@ jobs:
           
           rand=$[$RANDOM % ${#arr[@]}]
           
-          git commit -m "${arr[$rand]}"
+          git commit -m "${arr[$rand]}" || echo "Commit failed, retrying..." && git add . && git commit -m "${arr[$rand]}"
           
       - name: GitHub Push
         uses: ad-m/github-push-action@master
