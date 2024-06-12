@@ -6,7 +6,7 @@ on:
       - main
       
   schedule:
-    - cron: "0 4,12,15,18,22 * * *" # See https://crontab.guru/#0_4,12,15,18,19_*_*_*
+    - cron: "0 4,12,15,18,22 * * *" # See https://crontab.guru/#0_4,12,15,19,22_*_*_*
 
 jobs:
   auto_commit:
@@ -65,8 +65,6 @@ jobs:
           git commit -m "${arr[$rand]}" || echo "Commit failed, retrying..." && git add . && git commit -m "${arr[$rand]}"
           
       - name: GitHub Push
-        uses: ad-m/github-push-action@master
-        with:
-          force: true
-          directory: "."
-          github_token: ${{ secrets.GH_TOKEN }}
+        run: |
+          remote_repo="https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push $remote_repo HEAD:main || (sleep 10 && git push $remote_repo HEAD:main)
