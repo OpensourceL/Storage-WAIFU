@@ -57,7 +57,7 @@ jobs:
           rm -r *.txt
           git config --local user.email "yusupsiapasangka@gmail.com"
           git config --local user.name "HindiaFtNpc"
-          git add tmp/
+          git add .
 
           arr[0]="chore(bot): ❤️‍🩹 auto commit"
           arr[1]="chore(bot): 💜 auto commit"
