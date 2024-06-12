@@ -3,7 +3,7 @@ name: Waifu Df
 on:
   push:
     branches:
-      - maindl
+      - main
       
   schedule:
     - cron: "0 4,12,15,18,22 * * *" # See https://crontab.guru/#0_4,12,15,18,19_*_*_*
@@ -17,12 +17,31 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Fetch Waifu Image
+      - name: Fetch Waifu Images
         run: |
+          # Download Waifu images
           curl -s https://api.waifu.im/search?included_tags=waifu | jq -r '.images[0].url' > waifu_url.txt
           img_url=$(cat waifu_url.txt)
           img_name=$(basename $img_url)
-          curl -s -o tmp/$img_name $img_url
+          curl -s -o tmp/waifu/$img_name $img_url
+          
+          # Download H images
+          curl -s https://api.waifu.im/search?included_tags=hentai | jq -r '.images[0].url' > hentai_url.txt
+          img_url=$(cat hentai_url.txt)
+          img_name=$(basename $img_url)
+          curl -s -o tmp/hentai/$img_name $img_url
+          
+          # Download MILF images
+          curl -s https://api.waifu.im/search?included_tags=milf | jq -r '.images[0].url' > milf_url.txt
+          img_url=$(cat milf_url.txt)
+          img_name=$(basename $img_url)
+          curl -s -o tmp/milf/$img_name $img_url
+          
+          # Download Maid images
+          curl -s https://api.waifu.im/search?included_tags=maid | jq -r '.images[0].url' > maid_url.txt
+          img_url=$(cat maid_url.txt)
+          img_name=$(basename $img_url)
+          curl -s -o tmp/maid/$img_name $img_url
           
       - name: Commit Changes
         run: |
