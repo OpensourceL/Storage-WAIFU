@@ -1,4 +1,4 @@
-name: Waifu Df Down
+name: Waifu Df
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
       
   schedule:
-    - cron: "0 4,12,15,18,22 * * *" # See https://crontab.guru/#0_4,12,15,18,22_*_*_*
+    - cron: "0 4,12,15,18,22 * * *" # See https://crontab.guru/#0_4,12,15,18,19_*_*_*
 
 jobs:
   auto_commit:
@@ -43,13 +43,13 @@ jobs:
           img_name=$(basename $img_url)
           curl -s -o tmp/maid/$img_name $img_url
           
-      - name: Commit Changes & rm .txt
+      - name: Commit Changes
         run: |
-          rm -f waifu_url.txt hentai_url.txt milf_url.txt maid_url.txt
+          rm -r *.txt
           git config --local user.email "yusupsiapasangka@gmail.com"
           git config --local user.name "HindiaFtNpc"
           git add tmp/
-          
+
           arr[0]="chore(bot): ❤️‍🩹 auto commit"
           arr[1]="chore(bot): 💜 auto commit"
           arr[2]="chore(bot): 💙 auto commit"
@@ -63,7 +63,7 @@ jobs:
           
           rand=$[$RANDOM % ${#arr[@]}]
           
-          git commit -m "${arr[$rand]}"
+          git commit -m "${arr[$rand]}" || echo "Commit failed, retrying..." && git add . && git commit -m "${arr[$rand]}"
           
       - name: GitHub Push
         uses: ad-m/github-push-action@master
@@ -71,10 +71,3 @@ jobs:
           force: true
           directory: "."
           github_token: ${{ secrets.GH_TOKEN }}
-
-      - name: Push Finnish
-        run: |
-          git add -u
-          git commit -m "chore(bot): Remove .txt files" || echo "No .txt files to remove"
-          remote_repo="https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git"
-          git push $remote_repo HEAD:main || (sleep 10 && git push $remote_repo HEAD:main)
